@@ -1,6 +1,12 @@
 package com.fibp.newprojects.components.layout
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -83,6 +89,9 @@ fun MyGridList(modifier: Modifier = Modifier) {
     val numbers = remember {
         mutableStateOf(List(50) { Random.nextInt(0, 6) })
     }
+    var showView by remember {
+        mutableStateOf(true)
+    }
 
     val colors = listOf(
         Color(color = 0xFFF44336),
@@ -102,11 +111,17 @@ fun MyGridList(modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(8.dp)
     ) {
         items(numbers.value) { randomNumber ->
-            Box(
-                modifier = Modifier.background(colors[randomNumber]),
-                contentAlignment = Alignment.Center
-            ){
-                Text(text = randomNumber.toString(), color = Color.White, fontSize = 28.sp)
+            // Estado local para cada item
+            var showView by remember { mutableStateOf(true) }
+            AnimatedVisibility (showView, enter = scaleIn(), exit = scaleOut()) {
+                Box(
+                    modifier = Modifier.background(colors[randomNumber]).
+                    clickable { if (randomNumber%2 == 0 && showView){ showView = !showView } },
+                    contentAlignment = Alignment.Center
+                ){
+
+                    Text(text = randomNumber.toString(), color = Color.White, fontSize = 28.sp)
+                }
             }
         }
     }
