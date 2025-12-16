@@ -2,6 +2,8 @@ package com.fibp.newprojects.components.layout
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -50,14 +53,30 @@ fun ScrollList(modifier: Modifier) {
     val showButton by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 10 }
     }
+
+    var isSelected by remember {
+        mutableStateOf(false)
+    }
     
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd){
+    val animatedFloat by animateFloatAsState(
+        targetValue = if (isSelected) 0.5f else 1f, label = ""
+    )
+
+    val animatedColor by animateColorAsState(
+        targetValue = if (isSelected) Color.Red else Color.Blue,
+        label = ""
+    )
+
+    Box(modifier = Modifier.fillMaxSize().background(animatedColor.copy(animatedFloat)),
+        contentAlignment = Alignment.TopEnd,
+    ){
         LazyColumn(state = listState) {
             items(100){
                 Text(text = "Item: $it" ,
                     modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(16.dp)
+                        .clickable { isSelected = !isSelected },
                     color = Color.Yellow
                 )
             }
@@ -115,8 +134,13 @@ fun MyGridList(modifier: Modifier = Modifier) {
             var showView by remember { mutableStateOf(true) }
             AnimatedVisibility (showView, enter = scaleIn(), exit = scaleOut()) {
                 Box(
-                    modifier = Modifier.background(colors[randomNumber]).
-                    clickable { if (randomNumber%2 == 0 && showView){ showView = !showView } },
+                    modifier = Modifier
+                        .background(colors[randomNumber])
+                        .clickable {
+                            if (randomNumber % 2 == 0 && showView) {
+                                showView = !showView
+                            }
+                        },
                     contentAlignment = Alignment.Center
                 ){
 
