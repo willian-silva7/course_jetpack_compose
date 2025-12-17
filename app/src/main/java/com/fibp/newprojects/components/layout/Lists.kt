@@ -2,8 +2,13 @@ package com.fibp.newprojects.components.layout
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
@@ -63,11 +68,16 @@ fun ScrollList(modifier: Modifier) {
     )
 
     val animatedColor by animateColorAsState(
-        targetValue = if (isSelected) Color.Red else Color.Blue,
+        targetValue = if (isSelected) Color.White else Color.Yellow,
         label = ""
     )
 
-    Box(modifier = Modifier.fillMaxSize().background(animatedColor.copy(animatedFloat)),
+    val animatedColorStroke by animateColorAsState(
+        targetValue = if (isSelected) Color.Gray else Color.White,
+        label = ""
+    )
+
+    Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopEnd,
     ){
         LazyColumn(state = listState) {
@@ -77,7 +87,7 @@ fun ScrollList(modifier: Modifier) {
                         .fillMaxSize()
                         .padding(16.dp)
                         .clickable { isSelected = !isSelected },
-                    color = Color.Yellow
+                    color = animatedColor.copy(animatedFloat)
                 )
             }
         }
@@ -158,7 +168,17 @@ fun MyAdvanceList(modifier: Modifier = Modifier) {
         mutableStateOf(List(100){"Item número $it"})
     }
 
-    LazyColumn {
+    val infiniteTransition = rememberInfiniteTransition()
+    val color by infiniteTransition.animateColor(
+        initialValue = Color.Black,
+        targetValue = Color.Gray,
+        animationSpec = infiniteRepeatable (
+            animation = tween(7000),
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+
+    LazyColumn(modifier = Modifier.background(color)) {
         itemsIndexed(items, key = {_, item -> item}){index, item ->
             Row {
                 Text(text = item + "   indice: $index", color = Color.White)
